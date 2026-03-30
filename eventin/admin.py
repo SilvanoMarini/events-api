@@ -3,7 +3,7 @@ from eventin.models import Event, Participant
 
 
 class Events(admin.ModelAdmin):
-    list_display = ('name', 'date', 'location', 'capacity')
+    list_display = ('id', 'name', 'date', 'location', 'capacity')
     list_filter = ('name', 'date',)
     search_fields = ('name', 'description', 'location')
     ordering = ('id', 'name')
@@ -14,7 +14,7 @@ admin.site.register(Event, Events)
 
 
 class Participants(admin.ModelAdmin):
-    list_display = ('name', 'cpf', 'email', 'phone')
+    list_display = ('id', 'name', 'cpf', 'email', 'phone')
     list_filter = ('name', 'cpf', 'email', 'phone')
     search_fields = ('name', 'cpf', 'email', 'phone')
     ordering = ('id', 'name')

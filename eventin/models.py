@@ -2,7 +2,6 @@ from django.db import models
 
 
 class Event(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=200)
     description = models.TextField()
     date = models.DateField()
@@ -14,7 +13,6 @@ class Event(models.Model):
 
 
 class Participant(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=200)
     cpf = models.CharField(max_length=11)
     email = models.EmailField()
