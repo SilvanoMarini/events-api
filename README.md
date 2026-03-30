@@ -9,6 +9,8 @@ A REST API for managing events, participants, and registrations, providing CRUD 
 - Django
 - Django REST Framework
 
+## 🚧 In Progress
+
 ### Database
 - PostgreSQL
 
