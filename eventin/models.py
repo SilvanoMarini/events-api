@@ -20,3 +20,16 @@ class Participant(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Registration(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
+    date_registered = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(
+            fields=['event', 'participant'], name='unique_registration')]
+
+    def __str__(self):
+        return f"{self.event.name} - {self.participant.name}"
