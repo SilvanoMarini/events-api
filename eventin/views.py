@@ -1,7 +1,6 @@
-from django.http import JsonResponse
-from .models import Event, Participant
+from .models import Event, Participant, Registration
 from rest_framework import viewsets
-from .serializers import EventSerializer, ParticipantSerializer
+from .serializers import EventSerializer, ParticipantSerializer, RegistrationSerializer
 
 
 class EventViewset(viewsets.ModelViewSet):
@@ -12,3 +11,8 @@ class EventViewset(viewsets.ModelViewSet):
 class ParticipantViewset(viewsets.ModelViewSet):
     queryset = Participant.objects.all()
     serializer_class = ParticipantSerializer
+
+
+class RegistrationViewset(viewsets.ModelViewSet):
+    queryset = Registration.objects.all()
+    serializer_class = RegistrationSerializer

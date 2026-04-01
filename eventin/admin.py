@@ -1,5 +1,5 @@
 from django.contrib import admin
-from eventin.models import Event, Participant
+from eventin.models import Event, Participant, Registration
 
 
 class Events(admin.ModelAdmin):
@@ -22,3 +22,14 @@ class Participants(admin.ModelAdmin):
 
 
 admin.site.register(Participant, Participants)
+
+
+class Registrations(admin.ModelAdmin):
+    list_display = ('id', 'event', 'participant', 'date_registered')
+    list_filter = ('event', 'participant', 'date_registered')
+    search_fields = ('event', 'participant', 'date_registered')
+    ordering = ('id',)
+    list_per_page = 20
+
+
+admin.site.register(Registration, Registrations)
