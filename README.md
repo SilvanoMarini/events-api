@@ -9,13 +9,13 @@ A REST API for managing events, participants, and registrations, providing CRUD 
 - Django
 - Django REST Framework
 
+### Authentication
+- JWT Authentication
+
 ## 🚧 In Progress
 
 ### Database
 - PostgreSQL
-
-### Authentication
-- JWT Authentication
 
 ### DevOps
 - Docker
