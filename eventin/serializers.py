@@ -21,3 +21,19 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = Registration
         fields = ['id', 'event', 'participant', 'date_registered']
         read_only_fields = ['id']
+
+
+class ListRegistrationEventSerializer(serializers.ModelSerializer):
+    participant = serializers.StringRelatedField()
+
+    class Meta:
+        model = Registration
+        fields = ['participant', 'date_registered']
+
+
+class ListRegistrationParticipantSerializer(serializers.ModelSerializer):
+    event = serializers.StringRelatedField()
+
+    class Meta:
+        model = Registration
+        fields = ['event', 'date_registered']
