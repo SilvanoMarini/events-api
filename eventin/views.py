@@ -1,5 +1,6 @@
 from .models import Event, Participant, Registration
 from rest_framework import viewsets, generics
+from rest_framework.permissions import IsAdminUser
 from .serializers import (
     EventSerializer, ParticipantSerializer, RegistrationSerializer, ListRegistrationEventSerializer, ListRegistrationParticipantSerializer
 )
@@ -16,6 +17,7 @@ class ParticipantViewset(viewsets.ModelViewSet):
 
 
 class RegistrationViewset(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
     queryset = Registration.objects.all()
     serializer_class = RegistrationSerializer
 
