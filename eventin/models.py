@@ -11,7 +11,9 @@ class Event(models.Model):
     location = models.CharField(max_length=200, validators=[
                                 MinLengthValidator(3)])
     capacity = models.PositiveIntegerField(
-        default=0, null=False, validators=[MinLengthValidator(1)])
+        default=0, null=False)
+    participant = models.ManyToManyField(
+        'Participant', through='Registration', related_name='events')
 
     def __str__(self):
         return self.name
@@ -37,8 +39,10 @@ class Participant(models.Model):
 
 
 class Registration(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
+    event = models.ForeignKey(
+        Event, on_delete=models.CASCADE, related_name='registrations')
+    participant = models.ForeignKey(
+        Participant, on_delete=models.CASCADE, related_name='registrations')
     date_registered = models.DateTimeField(auto_now_add=True)
 
     class Meta:

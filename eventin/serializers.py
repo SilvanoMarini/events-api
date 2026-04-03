@@ -1,14 +1,21 @@
 from rest_framework import serializers
 from .models import Event, Participant, Registration
 from django.utils import timezone
+from django.db import transaction
 from .validators import validate_cpf, validate_name, validate_phone
 
 
 class EventSerializer(serializers.ModelSerializer):
+    remaining_capacity = serializers.SerializerMethodField()
+
     class Meta:
         model = Event
-        fields = ['id', 'name', 'description', 'date', 'location', 'capacity']
+        fields = ['id', 'name', 'description', 'date',
+                  'location', 'capacity', 'remaining_capacity']
         read_only_fields = ['id']
+
+    def get_remaining_capacity(self, obj):
+        return obj.capacity - obj.registrations.count()
 
     def validate_name(self, value):
         value = value.strip()
@@ -49,7 +56,7 @@ class EventSerializer(serializers.ModelSerializer):
 class ParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Participant
-        fields = ['id', 'name', 'cpf', 'email', 'phone']
+        fields = ['id', 'name', 'cpf', 'email', 'phone',]
         read_only_fields = ['id']
 
     def validate_name(self, value):
@@ -71,6 +78,32 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = Registration
         fields = ['id', 'event', 'participant', 'date_registered']
         read_only_fields = ['id']
+
+    def validate(self, data):
+        event = data['event']
+
+        total_registrations = event.registrations.count()
+
+        if total_registrations >= event.capacity:
+            raise serializers.ValidationError(
+                "This event has reached maximum capacity."
+            )
+
+        return data
+
+    def create(self, validated_data):
+        with transaction.atomic():
+
+            event = validated_data['event']
+
+        event = Event.objects.select_for_update().get(id=event.id)
+
+        if event.registrations.count() >= event.capacity:
+            raise serializers.ValidationError(
+                "This event has reached maximum capacity."
+            )
+
+        return super().create(validated_data)
 
 
 class ListRegistrationEventSerializer(serializers.ModelSerializer):
