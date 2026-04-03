@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Event, Participant, Registration
+from django.utils import timezone
+from .validators import validate_cpf, validate_name, validate_phone
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -8,12 +10,60 @@ class EventSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'date', 'location', 'capacity']
         read_only_fields = ['id']
 
+    def validate_name(self, value):
+        value = value.strip()
+        if len(value) < 3:
+            raise serializers.ValidationError(
+                "Name must have at least 3 characters.")
+
+        return value
+
+    def validate_description(self, value):
+        if len(value.strip()) < 10:
+            raise serializers.ValidationError(
+                "Description must have at least 10 characters.")
+        return value.strip()
+
+    def validate_date(self, value):
+        # Skip validation if the date remains unchanged during update operations
+        if self.instance and value == self.instance.date:
+            return value
+
+        if value < timezone.now():
+            raise serializers.ValidationError("Date cannot be in the past.")
+
+        return value
+
+    def validate_location(self, value):
+        if len(value.strip()) < 3:
+            raise serializers.ValidationError(
+                "Location must have at least 3 characters.")
+        return value.strip()
+
+    def validate_capacity(self, value):
+        if value < 1:
+            raise serializers.ValidationError("Capacity must be at least 1.")
+        return value
+
 
 class ParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Participant
         fields = ['id', 'name', 'cpf', 'email', 'phone']
         read_only_fields = ['id']
+
+    def validate_name(self, value):
+        return validate_name(value)
+
+    def validate_cpf(self, value):
+        if self.instance and value == self.instance.cpf:
+            return value
+        return validate_cpf(value)
+
+    def validate_phone(self, value):
+        if self.instance and value == self.instance.phone:
+            return value
+        return validate_phone(value)
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
