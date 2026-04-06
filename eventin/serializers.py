@@ -93,9 +93,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         with transaction.atomic():
-
             event = validated_data['event']
 
+            # Lock the event row to ensure capacity check is consistent
+            # and prevent overbooking in concurrent transactions
             event = Event.objects.select_for_update().get(id=event.id)
 
             if event.registrations.count() >= event.capacity:
