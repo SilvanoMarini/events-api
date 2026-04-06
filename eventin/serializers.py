@@ -96,12 +96,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
             event = validated_data['event']
 
-        event = Event.objects.select_for_update().get(id=event.id)
+            event = Event.objects.select_for_update().get(id=event.id)
 
-        if event.registrations.count() >= event.capacity:
-            raise serializers.ValidationError(
-                "This event has reached maximum capacity."
-            )
+            if event.registrations.count() >= event.capacity:
+                raise serializers.ValidationError(
+                    "This event has reached maximum capacity."
+                )
 
         return super().create(validated_data)
 
