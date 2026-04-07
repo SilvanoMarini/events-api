@@ -25,7 +25,7 @@ class Participant(models.Model):
     cpf = models.CharField(max_length=14, unique=True,
                            validators=[validate_cpf])
     email = models.EmailField(unique=True, validators=[EmailValidator()])
-    phone = models.CharField(max_length=16, unique=True, validators=[
+    phone = models.CharField(max_length=20, unique=True, validators=[
                              validate_phone])
 
     def __str__(self):

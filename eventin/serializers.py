@@ -121,3 +121,9 @@ class ListRegistrationParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Registration
         fields = ['event', 'date_registered']
+
+
+class ParticipantSerializerV2(serializers.ModelSerializer):
+    class Meta:
+        model = Participant
+        fields = ['id', 'name', 'email']
