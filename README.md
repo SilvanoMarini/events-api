@@ -91,55 +91,76 @@ DATABASE_URL=sqlite:///db.sqlite3
    python manage.py runserver
    ```
 
+## Public routes
+
+These endpoints do **not** require a JWT (or session) for the listed method:
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/` | API root (links to resources and auth URLs) |
+| `GET` | `/health/` | Health check |
+| `GET` | `/api/events/` | List events |
+| `GET` | `/api/events/{id}/` | Event detail |
+| `GET` | `/api/participants/` | List participants |
+| `GET` | `/api/participants/{id}/` | Participant detail |
+| `POST` | `/api/token/` | Obtain JWT (body: `username`, `password`) |
+| `POST` | `/api/token/refresh/` | Refresh access token (body: `refresh`) |
+
+The Django admin login page is reachable at `GET /admin/` without API auth; using the admin UI still requires a staff/superuser account.
+
+All other API routes (writes on events/participants, any registration route, nested registration lists) require authentication as described below.
+
 ## Authentication
 
-All API endpoints require an authenticated user by default.
+Use JWT for protected requests:
 
-- Obtain token:
-  - `POST /api/token/`
-- Refresh token:
-  - `POST /api/token/refresh/`
+- **Obtain token:** `POST /api/token/`
+- **Refresh token:** `POST /api/token/refresh/`
 
-Include the token in requests:
+Include the access token on protected requests:
 
 ```http
 Authorization: Bearer <access_token>
 ```
 
+- **Events & participants:** `create`, `update`, and `destroy` require an authenticated user; `list` and `retrieve` are public (see table above).
+- **Registrations** (`/api/registrations/…`): all methods require an **admin** user (`IsAdminUser`).
+- **Nested lists** `GET /api/events/{id}/registrations/` and `GET /api/participants/{id}/registrations/` require an authenticated user (default DRF permission).
+
+Participant payload variant: add `?version=v2` to participant endpoints when supported.
+
 ## Main endpoints
 
-`ModelViewSet` routes use trailing slashes (`/`).
+Base URL for CRUD resources: **`/api/`** (router uses trailing slashes).
 
 ### Events
 
-- `GET /events/`
-- `POST /events/`
-- `GET /events/{id}/`
-- `PUT /events/{id}/`
-- `PATCH /events/{id}/`
-- `DELETE /events/{id}/`
-- `GET /events/{id}/registrations`
+- `GET /api/events/`
+- `POST /api/events/`
+- `GET /api/events/{id}/`
+- `PUT /api/events/{id}/`
+- `PATCH /api/events/{id}/`
+- `DELETE /api/events/{id}/`
+- `GET /api/events/{id}/registrations/`
 
 ### Participants
 
-- `GET /participants/`
-- `POST /participants/`
-- `GET /participants/{id}/`
-- `PUT /participants/{id}/`
-- `PATCH /participants/{id}/`
-- `DELETE /participants/{id}/`
-- `GET /participants/{id}/registrations`
+- `GET /api/participants/`
+- `POST /api/participants/`
+- `GET /api/participants/{id}/`
+- `PUT /api/participants/{id}/`
+- `PATCH /api/participants/{id}/`
+- `DELETE /api/participants/{id}/`
+- `GET /api/participants/{id}/registrations/`
 
-### Registrations
+### Registrations (admin only)
 
-- `GET /registrations/`
-- `POST /registrations/`
-- `GET /registrations/{id}/`
-- `PUT /registrations/{id}/`
-- `PATCH /registrations/{id}/`
-- `DELETE /registrations/{id}/`
-
-Note: registration operations require admin permissions.
+- `GET /api/registrations/`
+- `POST /api/registrations/`
+- `GET /api/registrations/{id}/`
+- `PUT /api/registrations/{id}/`
+- `PATCH /api/registrations/{id}/`
+- `DELETE /api/registrations/{id}/`
 
 ## Payload examples
 
