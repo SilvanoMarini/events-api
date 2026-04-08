@@ -1,7 +1,7 @@
 from .models import Event, Participant, Registration
 from rest_framework import viewsets, generics, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, AllowAny
 from .serializers import (
     EventSerializer, ParticipantSerializer, RegistrationSerializer,
     ListRegistrationEventSerializer, ListRegistrationParticipantSerializer,
@@ -17,6 +17,11 @@ class EventViewset(viewsets.ModelViewSet):
     ordering_fields = ['name']
     search_fields = ['name', 'location',]
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return super().get_permissions()
+
 
 class ParticipantViewset(viewsets.ModelViewSet):
     queryset = Participant.objects.all()
@@ -29,6 +34,11 @@ class ParticipantViewset(viewsets.ModelViewSet):
         if self.request.version == 'v2':
             return ParticipantSerializerV2
         return ParticipantSerializer
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return super().get_permissions()
 
 
 class RegistrationViewset(viewsets.ModelViewSet):
