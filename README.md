@@ -1,104 +1,176 @@
 # Events API
 
-A REST API for managing events, participants, and registrations, providing CRUD operations and user authentication.
+REST API for managing events, participants, and registrations, with JWT authentication.
 
-## 🚀 Technologies
+## Technologies
 
-### Backend
-- Python
+- Python 3
 - Django
 - Django REST Framework
-
-### Authentication
-- JWT Authentication
-
-## 🚧 In Progress
-
-### Database
+- django-filter
+- Simple JWT
 - PostgreSQL
-
-### DevOps
-- Docker
-- Docker Compose
-
 
 ## Features
 
-- Manage events (CRUD operations)
-- Manage participants
-- Handle event registrations
-- Authenticate users
+- Full CRUD for events
+- Full CRUD for participants
+- Registration CRUD with event capacity control
+- Endpoints to list registrations by event and by participant
+- JWT authentication (`access` and `refresh`)
+- Search, ordering, and pagination on main endpoints
+- Alternative participant serializer via query parameter (`?version=v2`)
 
+## Requirements
 
-## Installation
+- Python 3.11+ (recommended)
+- `pip`
+- `.env` file with required variables
+
+## Environment variables
+
+Use `.env.example` as a base:
+
+```env
+DEBUG=True
+SECRET_KEY=your-secret-key
+DATABASE_URL=your-database-url
+ALLOWED_HOSTS=127.0.0.1,localhost
+```
+
+Local SQLite example:
+
+```env
+DATABASE_URL=sqlite:///db.sqlite3
+```
+
+## Installation and run
 
 1. Clone the repository:
-  ```bash
-  git clone https://github.com/SilvanoMarini/events-api.git
-  ```
+   ```bash
+   git clone https://github.com/SilvanoMarini/events-api.git
+   cd events-api
+   ```
 
-2. Navigate to the project directory:
-  ```bash 
-  cd events-api
-  ```
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv .venv
+   ```
 
-3. Create and activate a virtual environment:
-  ```bash
-  python -m venv venv
+   Linux/macOS:
+   ```bash
+   source .venv/bin/activate
+   ```
 
-  # Linux/macOS
-  source venv/bin/activate
+   Windows (PowerShell):
+   ```powershell
+   .\.venv\Scripts\Activate.ps1
+   ```
 
-  # Windows
-  venv\Scripts\activate
-  ```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-4. Install dependencies:
-  ```bash
-  pip install -r requirements.txt
-  ```
+4. Configure `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+   Windows (PowerShell):
+   ```powershell
+   Copy-Item .env.example .env
+   ```
 
-5. Apply database migrations:
-  ```bash
-  python manage.py migrate
-  ```
+5. Run migrations:
+   ```bash
+   python manage.py migrate
+   ```
 
-6. Run the development server:
-  ```bash
-  python manage.py runserver
-  ``` 
+6. Start the development server:
+   ```bash
+   python manage.py runserver
+   ```
 
+## Authentication
 
-## API Endpoints
+All API endpoints require an authenticated user by default.
 
-### Events  
+- Obtain token:
+  - `POST /api/token/`
+- Refresh token:
+  - `POST /api/token/refresh/`
 
-- GET /events → List all events
-- POST /events → Create a new event
-- GET /events/{id} → Retrieve a specific event
-- PUT /events/{id} → Update an event
-- DELETE /events/{id} → Delete an event
+Include the token in requests:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+## Main endpoints
+
+`ModelViewSet` routes use trailing slashes (`/`).
+
+### Events
+
+- `GET /events/`
+- `POST /events/`
+- `GET /events/{id}/`
+- `PUT /events/{id}/`
+- `PATCH /events/{id}/`
+- `DELETE /events/{id}/`
+- `GET /events/{id}/registrations`
 
 ### Participants
 
-- GET /participants → List all participants
-- POST /participants → Create a new participant 
+- `GET /participants/`
+- `POST /participants/`
+- `GET /participants/{id}/`
+- `PUT /participants/{id}/`
+- `PATCH /participants/{id}/`
+- `DELETE /participants/{id}/`
+- `GET /participants/{id}/registrations`
 
 ### Registrations
 
-- GET /registrations → List all registrations
-- POST /registrations → Create a new registration
+- `GET /registrations/`
+- `POST /registrations/`
+- `GET /registrations/{id}/`
+- `PUT /registrations/{id}/`
+- `PATCH /registrations/{id}/`
+- `DELETE /registrations/{id}/`
 
-### Authentication
+Note: registration operations require admin permissions.
 
-- POST /auth/login → Authenticate user and return JWT token
+## Payload examples
 
-### Example Request
+### Create event
 
 ```json
 {
-  "title": "Tech Conference",
-  "description": "Annual tech event",
-  "date": "2026-01-01",
-  "location": "São Paulo"
+  "name": "Tech Conference 2026",
+  "description": "Annual event about technology and innovation.",
+  "date": "2026-10-20T19:00:00-03:00",
+  "location": "Sao Paulo",
+  "capacity": 200
 }
+```
+
+### Create participant
+
+```json
+{
+  "name": "Maria Silva",
+  "cpf": "123.456.789-09",
+  "email": "maria@example.com",
+  "phone": "+55 11 99999-9999"
+}
+```
+
+### Create registration
+
+```json
+{
+  "event": 1,
+  "participant": 1
+}
+```
